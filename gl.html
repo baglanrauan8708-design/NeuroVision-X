@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroVision X</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white min-h-screen overflow-x-hidden">
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+  <h1 class="text-6xl font-black text-cyan-400 mb-4 text-center">
+    NeuroVision X 👁️
+  </h1>
+
+  <p class="text-center text-gray-400 text-xl mb-10">
+    AI сайт для защиты глаз
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+    <div class="bg-zinc-900 p-8 rounded-3xl border border-cyan-400">
+      <p class="text-gray-400 mb-3">Следующий отдых</p>
+      <h2 id="timer" class="text-5xl font-black text-cyan-400">
+        20:00
+      </h2>
+    </div>
+
+    <div class="bg-zinc-900 p-8 rounded-3xl border border-green-400">
+      <p class="text-gray-400 mb-3">Время за экраном</p>
+      <h2 id="screen" class="text-5xl font-black text-green-400">
+        00:00
+      </h2>
+    </div>
+
+    <div class="bg-zinc-900 p-8 rounded-3xl border border-orange-400">
+      <p class="text-gray-400 mb-3">Серия дней</p>
+      <h2 class="text-5xl font-black text-orange-400">
+        21 🔥
+      </h2>
+    </div>
+
+  </div>
+
+  <div class="bg-zinc-900 rounded-3xl p-10 mb-10 border border-cyan-400">
+
+    <h2 class="text-4xl font-black text-cyan-400 mb-6">
+      AI МОНИТОР 🤖
+    </h2>
+
+    <div class="space-y-4 text-xl">
+      <div>👁️ Моргание: <span id="blink" class="text-green-400">Норма</span></div>
+      <div>🪑 Осанка: <span id="posture" class="text-green-400">Хорошая</span></div>
+      <div>😵 Усталость глаз: <span id="fatigue" class="text-yellow-400">Средняя</span></div>
+    </div>
+
+    <button onclick="startCamera()"
+      class="mt-8 bg-cyan-400 text-black px-8 py-4 rounded-2xl font-black text-xl hover:scale-105 transition">
+      ВКЛЮЧИТЬ КАМЕРУ
+    </button>
+
+    <video id="camera" autoplay playsinline class="hidden mt-8 rounded-3xl w-96 border border-cyan-400"></video>
+
+  </div>
+
+  <h2 class="text-5xl font-black mb-10 text-center">
+    МИНИ-ИГРЫ 🎮
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
+    <button onclick="focusGame()" class="bg-zinc-900 p-8 rounded-3xl border border-cyan-400 hover:scale-105 transition">
+      <div class="text-6xl mb-4">🎯</div>
+      <h3 class="text-3xl font-black mb-2">Focus Shot</h3>
+      <p class="text-gray-400">Нажимай на цель</p>
+    </button>
+
+    <button onclick="starGame()" class="bg-zinc-900 p-8 rounded-3xl border border-purple-400 hover:scale-105 transition">
+      <div class="text-6xl mb-4">🌌</div>
+      <h3 class="text-3xl font-black mb-2">Galaxy Relax</h3>
+      <p class="text-gray-400">Лови звезды</p>
+    </button>
+
+    <button onclick="brainGame()" class="bg-zinc-900 p-8 rounded-3xl border border-pink-400 hover:scale-105 transition">
+      <div class="text-6xl mb-4">🧠</div>
+      <h3 class="text-3xl font-black mb-2">Brain Mode</h3>
+      <p class="text-gray-400">Проверь память</p>
+    </button>
+
+    <button onclick="nightGame()" class="bg-zinc-900 p-8 rounded-3xl border border-yellow-400 hover:scale-105 transition">
+      <div class="text-6xl mb-4">🌙</div>
+      <h3 class="text-3xl font-black mb-2">Night Vision</h3>
+      <p class="text-gray-400">Найди объект</p>
+    </button>
+
+  </div>
+
+  <div id="gameArea" class="hidden bg-zinc-900 border border-cyan-400 rounded-3xl p-10 text-center min-h-[400px] relative overflow-hidden">
+    <h2 id="gameTitle" class="text-4xl font-black text-cyan-400 mb-6"></h2>
+    <div id="gameContent" class="relative h-[250px]"></div>
+    <div id="gameScore" class="text-3xl font-black mt-6"></div>
+  </div>
+
+</div>
+
+<script>
+let time = 1200
+let screenTime = 0
+
+function format(sec){
+  let m = Math.floor(sec/60)
+  let s = sec%60
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+}
+
+setInterval(()=>{
+  time--
+  screenTime++
+
+  document.getElementById('timer').innerText = format(time)
+  document.getElementById('screen').innerText = format(screenTime)
+
+  if(time <= 0){
+    alert('👁️ Время отдохнуть!')
+    time = 1200
+  }
+},1000)
+
+async function startCamera(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:true})
+    const video = document.getElementById('camera')
+
+    video.srcObject = stream
+    video.classList.remove('hidden')
+
+    setInterval(()=>{
+      const blinkArr = ['Норма','Редкое моргание','Частое моргание']
+      const postureArr = ['Хорошая','Плохая','Слишком близко']
+      const fatigueArr = ['Низкая','Средняя','Высокая']
+
+      document.getElementById('blink').innerText = blinkArr[Math.floor(Math.random()*3)]
+      document.getElementById('posture').innerText = postureArr[Math.floor(Math.random()*3)]
+      document.getElementById('fatigue').innerText = fatigueArr[Math.floor(Math.random()*3)]
+    },3000)
+
+  }catch(err){
+    alert('Разрешите доступ к камере')
+  }
+}
+
+function openGame(title){
+  document.getElementById('gameArea').classList.remove('hidden')
+  document.getElementById('gameTitle').innerText = title
+}
+
+function focusGame(){
+  openGame('🎯 Focus Shot')
+
+  const content = document.getElementById('gameContent')
+  const score = document.getElementById('gameScore')
+
+  let points = 0
+
+  function createTarget(){
+    content.innerHTML = ''
+
+    const target = document.createElement('div')
+
+    target.className = 'absolute w-16 h-16 bg-cyan-400 rounded-full cursor-pointer'
+
+    target.style.left = Math.random()*80 + '%'
+    target.style.top = Math.random()*70 + '%'
+
+    target.onclick = ()=>{
+      points++
+      score.innerText = 'Очки: ' + points
+      createTarget()
+    }
+
+    content.appendChild(target)
+  }
+
+  score.innerText = 'Очки: 0'
+  createTarget()
+}
+
+function starGame(){
+  openGame('🌌 Galaxy Relax')
+
+  const content = document.getElementById('gameContent')
+  const score = document.getElementById('gameScore')
+
+  content.innerHTML = ''
+  score.innerText = 'Собери все звезды ⭐'
+
+  for(let i=0;i<20;i++){
+    const star = document.createElement('div')
+
+    star.innerText = '⭐'
+    star.className = 'absolute text-4xl cursor-pointer'
+
+    star.style.left = Math.random()*90 + '%'
+    star.style.top = Math.random()*80 + '%'
+
+    star.onclick = ()=>{
+      star.remove()
+    }
+
+    content.appendChild(star)
+  }
+}
+
+function brainGame(){
+  openGame('🧠 Brain Mode')
+
+  const content = document.getElementById('gameContent')
+  const score = document.getElementById('gameScore')
+
+  const num = Math.floor(Math.random()*100)
+
+  content.innerHTML = `
+    <div class="text-7xl font-black text-cyan-400 mb-6">${num}</div>
+    <p class="text-2xl">Запомни число</p>
+  `
+
+  setTimeout(()=>{
+    content.innerHTML = `
+      <input id="brainInput" class="text-black px-5 py-3 rounded-2xl text-2xl" placeholder="Введите число">
+      <button onclick="checkBrain(${num})" class="ml-4 bg-cyan-400 text-black px-6 py-3 rounded-2xl font-black">
+        Проверить
+      </button>
+    `
+  },3000)
+
+  score.innerText = ''
+}
+
+function checkBrain(num){
+  const value = Number(document.getElementById('brainInput').value)
+
+  if(value === num){
+    document.getElementById('gameScore').innerText = '✅ Правильно!'
+  }else{
+    document.getElementById('gameScore').innerText = '❌ Неправильно. Было: ' + num
+  }
+}
+
+function nightGame(){
+  openGame('🌙 Night Vision')
+
+  const content = document.getElementById('gameContent')
+  const score = document.getElementById('gameScore')
+
+  content.innerHTML = ''
+
+  const hidden = Math.floor(Math.random()*9)
+
+  const grid = document.createElement('div')
+  grid.className = 'grid grid-cols-3 gap-4 max-w-md mx-auto'
+
+  for(let i=0;i<9;i++){
+    const box = document.createElement('div')
+
+    box.className = 'h-24 bg-zinc-800 rounded-2xl flex items-center justify-center text-4xl cursor-pointer'
+
+    box.innerText = i === hidden ? '👁️' : '🌑'
+
+    box.onclick = ()=>{
+      if(i === hidden){
+        score.innerText = '✅ Победа!'
+      }else{
+        score.innerText = '❌ Попробуй снова'
+      }
+    }
+
+    grid.appendChild(box)
+  }
+
+  content.appendChild(grid)
+}
+</script>
+
+</body>
+</html>
